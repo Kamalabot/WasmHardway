@@ -1,6 +1,9 @@
-package main 
+package main
+
 import "fmt"
 
 func main(){
-	fmt.Println("Hello World")
+	var fname string;
+	fmt.Scanln(&fname)
+	fmt.Println("Hello World", fname)
 }
