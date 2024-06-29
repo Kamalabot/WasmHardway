@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <script>
+      const wasmModule = await WebAssembly.instantiateStreaming(fetch('hello.wasm'));
+      wasmModule.exports.hello_world();
+    </script>
+  </body>
+</html>
