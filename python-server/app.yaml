@@ -1,0 +1,5 @@
+kind: wasmer.io/App.v0
+name: python-server
+owner: kamalabot
+package: .
+app_id: da_RvJI4t0UGLNR
