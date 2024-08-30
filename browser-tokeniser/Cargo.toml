@@ -1,15 +1,15 @@
 # You must change these to your own details.
 [package]
-name = "handling_events"
-description = "Understanding the Rust, Webassy and WebPack with Handling events"
+name = "browser-tokenizer"
+description = "Tokenizer that works on the browser"
 version = "0.1.0"
-authors = ["Me <me@example.com>"]
+authors = ["You <you@example.com>"]
 categories = ["wasm"]
 readme = "README.md"
 edition = "2018"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 # This makes the compiled code faster and smaller, but it makes compiling slower,
@@ -21,6 +21,15 @@ lto = true
 #default = ["wee_alloc"]
 
 [dependencies]
+anyhow = "1.0.86"
+candle-core = { git = "https://github.com/huggingface/candle.git", version = "0.6.1" }
+candle-nn = { git = "https://github.com/huggingface/candle.git", version = "0.6.1" }
+candle-transformers = { git = "https://github.com/huggingface/candle.git", version = "0.6.1" }
+getrandom = { version = "0.2", features = ["js"] }
+hf-hub = "0.3.2"
+serde_json = "1.0.127"
+tokenizers = { version = "0.14.0", default-features = false, features = ["unstable_wasm"] }
+
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.
 wasm-bindgen = "0.2.45"
@@ -37,14 +46,11 @@ version = "0.3.22"
 features = [
   "console",
   "Window",
+  "Document",
   "HtmlElement",
   "HtmlInputElement",
-  "HtmlButtonElement"
-  "Document",
-  "Element",
-  "Node",
-  "EventTarget"
-]
+  "HtmlButtonElement",
+  "EventTarget"]
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

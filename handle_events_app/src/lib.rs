@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{window, HtmlElement, console};
+// htmlButton
 
 // When the `wee_alloc` feature is enabled, this uses `wee_alloc` as the global
 // allocator.
