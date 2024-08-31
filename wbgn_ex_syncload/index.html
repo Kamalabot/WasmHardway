@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Note there is no usage of `type=module` but you will see inside-->
+    <script>
+      // spawn a webworker
+      const worker = new Worker("/worker.js", { type: "module"});
+      // look for message from worker
+      worker.onmessage = ({ data }) => {
+        const { type } = data;
+
+        switch (type) {
+          case "FETCH WASM": {
+            /** Worker fetches the modules, and convert into ArrayBuffer
+            * and transfer the bytes 
+            // */
+            console.log("fetching wasm")
+            fetch("./pkg/rust_syncloader_bg.wasm")
+              .then((response) => response.arrayBuffer())
+              .then((bytes) => {
+                worker.postMessage(bytes, [bytes]);
+              });
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      };
+    </script>
+  </body>
+</html>
