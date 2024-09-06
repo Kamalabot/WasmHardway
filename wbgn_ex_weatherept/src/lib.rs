@@ -257,11 +257,11 @@ fn create_input_box(document: &Document) -> Element {
 
 // Get response from weather api
 async fn get_response(location: &str) -> JsonValue {
-    let url1 = "http://api.openweathermap.org/data/2.5/weather?q=";
+    let url1 = "https://api.openweathermap.org/data/2.5/weather?q=";
     // let key = "OPENWEATHER_KEY";
     // let keyval = std::env::var(key).unwrap();
     // let url2 = format!("&appid={}", keyval);
-    let url2 = "&appid=6e6fe8421e1e45a7c4a5df9b2e6fe811";
+    let url2 = "&appid=a129b71475b729604782b7910baa8e96";
     // println!("The key is: {}", keyval);
     let url = [url1, location, &url2].concat();
 

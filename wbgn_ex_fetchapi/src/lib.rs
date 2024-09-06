@@ -4,15 +4,16 @@ use web_sys::{Request, RequestInit, RequestMode, Response};
 
 // observe there is no start function in this
 // and the function is async, as it will await the response
+//
 #[wasm_bindgen]
-pub async fn run(repo: String) -> Result<JsValue, JsValue>{
+pub async fn run(repo: String) -> Result<JsValue, JsValue> {
     let opts = RequestInit::new();
 
     opts.set_method("GET");
     opts.set_mode(RequestMode::Cors);
 
     let url = format!("https://api.github.com/repos/{}/branches/master", repo);
-    
+
     let request = Request::new_with_str_and_init(&url, &opts)?;
 
     request

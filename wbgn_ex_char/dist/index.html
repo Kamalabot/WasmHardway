@@ -1,35 +1,55 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
-    <title>Document</title>
-  <script defer src="index.js"></script></head>
-  <body>
-    <!-- Note there is no usage of `type=module` but you will see inside-->
-    <script>
-      // spawn a webworker
-      const worker = new Worker("/worker.js", { type: "module"});
-      // look for message from worker
-      worker.onmessage = ({ data }) => {
-        const { type } = data;
+    <head>
+        <title>Counter</title>
+        <style>
+            * {
+                font-family: sans-serif;
+                font-size: 16pt;
+            }
+            h1 {
+                font-size: 18pt;
+                font-weight: bold;
+                margin: 0;
+            }
+            button {
+                padding: 5px 10px;
+                border: none;
+                background: slategrey;
+                margin: 10px auto;
+                color: white;
+            }
+            body {
+                width: 400px;
+                margin: auto;
+            }
+            #container,
+            .counter {
+                display: flex;
+                flex-flow: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+                align-content: flex-start;
+            }
+            .counter {
+                margin-bottom: 10px;
+                background: steelblue;
+                color: white;
+                align-items: center;
+                width: 100%;
+            }
+            .field {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-around;
+                width: 100%;
+            }
+        </style>
+    <script defer src="index.js"></script></head>
+    <body>
+        <button id="add-counter" type="button">add counter</button>
+        <div id="container">
 
-        switch (type) {
-          case "FETCH WASM": {
-            /** Worker fetches the modules, and convert into ArrayBuffer
-            * and transfer the bytes 
-            // */
-            console.log("fetching wasm")
-            fetch("./pkg/rust_syncloader_bg.wasm")
-              .then((response) => response.arrayBuffer())
-              .then((bytes) => {
-                worker.postMessage(bytes, [bytes]);
-              });
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      };
-    </script>
-  </body>
+        </div>
+    </body>
 </html>
