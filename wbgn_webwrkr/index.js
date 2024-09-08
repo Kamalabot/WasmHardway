@@ -2,7 +2,6 @@
 // In theory, we could also use all other functions/struct types from Rust which we have bound with
 // `#[wasm_bindgen]`
 const {startup} = wasm_bindgen;
-
 async function run_wasm() {
     // Load the wasm file by awaiting the Promise returned by `wasm_bindgen`
     // `wasm_bindgen` was imported in `index.html`

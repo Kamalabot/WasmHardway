@@ -5,7 +5,18 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <script type="module">
+        import init, { send_chat_completion } from '../pkg/rust_openai_wbgn.js';
 
+        async function run() {
+            await init();
+            let r = await send_chat_completion("https://api.openai.com/v1/chat/completions",
+            "sk-removed", 
+            "Where is the sun located");
+            console.log(r)
+        }
+        run();
+    </script>
 </head>
 
 <body style data-gr-c-s-loaded="true">

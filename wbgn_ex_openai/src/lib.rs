@@ -1,6 +1,7 @@
 #[allow(dead_code)]
 // #![allow(warnings)]
-use js_sys::Promise;
+// use js_sys::Promise;
+use wasm_bindgen::prelude::*;
 use serde::Serialize;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
@@ -19,11 +20,12 @@ struct Message {
     content: String,
 }
 
-async fn send_chat_completion() -> Result<(), JsValue> {
+#[wasm_bindgen]
+pub async fn send_chat_completion(prompt: String, apikey: String) -> Result<JsValue, JsValue> {
     // Create request body
     let messages = vec![Message {
         role: "user".into(),
-        content: "Where is the sun located?".into(),
+        content: prompt,
     }];
 
     let chat_request = ChatCompletionRequest {
@@ -41,35 +43,26 @@ async fn send_chat_completion() -> Result<(), JsValue> {
     opts.set_body(&JsValue::from_str(&body));
     opts.set_mode(RequestMode::Cors); // adjust if necessary
 
-    // Create headers
-    let headers = Headers::new().unwrap();
-
-    headers.append("Content-Type", "application/json").unwrap();
-
-    headers.append("Authorization", "Bearer api-key").unwrap(); // Replace with your OpenAI key
-
-    opts.set_headers(&headers);
+    let api_key = format!("Bearer {}", apikey); // Replace with your OpenAI key
 
     // Create request object
     let request =
         Request::new_with_str_and_init("https://api.openai.com/v1/chat/completions", &opts)?;
 
+    request
+        .headers()
+        .set("Content-Type", "application/json")
+        .unwrap();
+    request.headers().set("Authorization", &api_key).unwrap();
+
     // Send the request using Fetch API
     let window = web_sys::window().unwrap();
-    let fetch_response: Promise = window.fetch_with_request(&request);
 
     // Convert Promise to Future
-    let response_value = JsFuture::from(fetch_response).await?;
+    let response_value = JsFuture::from(window.fetch_with_request(&request)).await?;
 
     // Check if the response is successful
     let response: Response = response_value.dyn_into().unwrap();
-    if response.ok() {
-        let json = JsFuture::from(response.json()?).await?;
-        // Process the response JSON (log it or use it in your app)
-        web_sys::console::log_1(&json);
-    } else {
-        web_sys::console::log_1(&JsValue::from_str("Failed to get a valid response"));
-    }
-
-    Ok(())
+    let json = JsFuture::from(response.json()?).await?;
+    Ok(json)
 }
