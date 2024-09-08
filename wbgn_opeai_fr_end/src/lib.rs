@@ -7,11 +7,17 @@ use web_sys::{console, window, Request, RequestInit, RequestMode, Response};
 // Function to send the request to OpenAI and handle the response
 #[wasm_bindgen]
 pub async fn fetch_chat_completion(api_key: String, prompt: String) -> Result<String, JsValue> {
-    console::log_1(&format!("Sending request with prompt: {}", prompt).into());
+    console::log_1(
+        &format!(
+            "Sending request with prompt: {}, api_key: {}",
+            prompt, api_key
+        )
+        .into(),
+    );
 
     // Create the request body as a JSON object
     let body = json!({
-        "model": "gpt-4o",
+        "model": "gpt-4",
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 100,
         "temperature": 0.7
@@ -28,10 +34,9 @@ pub async fn fetch_chat_completion(api_key: String, prompt: String) -> Result<St
     // console::log_1(&built_opt);
     let request =
         Request::new_with_str_and_init("https://api.openai.com/v1/chat/completions", &opts)?;
-    request
-        .headers()
-        .set("Authorization", &format!("Bearer {}", api_key))?;
     request.headers().set("Content-Type", "application/json")?;
+    let api = &format!("Bearer {}", api_key);
+    request.headers().set("Authorization", api)?;
 
     // let built_req: JsValue =
     //     format!("Here is fully formed request: {:?}", request.to_string()).into();

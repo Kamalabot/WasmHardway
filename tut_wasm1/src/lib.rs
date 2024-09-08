@@ -64,10 +64,10 @@ pub async fn post_data(
 
 #[wasm_bindgen]
 pub async fn post_openai(url: String, apikey: String, prompt: String) -> Result<JsValue, JsValue> {
-     // Create request body
+    // Create request body
     let messages = vec![Message {
         role: "user".into(),
-        content: prompt.into(),
+        content: prompt,
     }];
 
     let chat_request = ChatCompletionRequest {
@@ -85,17 +85,13 @@ pub async fn post_openai(url: String, apikey: String, prompt: String) -> Result<
     opts.set_body(&JsValue::from_str(&body));
     opts.set_mode(RequestMode::Cors); // adjust if necessary
 
-
     let request = Request::new_with_str_and_init(&url, &opts)?;
     let api_key = format!("Bearer {}", apikey);
     request
         .headers()
         .set("Content-Type", "application/json")
         .unwrap();
-    request
-        .headers()
-        .set("Authorization", &api_key)
-        .unwrap();
+    request.headers().set("Authorization", &api_key).unwrap();
 
     let win = web_sys::window().unwrap();
     let resp_value = JsFuture::from(win.fetch_with_request(&request)).await?;

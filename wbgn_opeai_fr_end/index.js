@@ -12,6 +12,16 @@ document.getElementById("submit").addEventListener("click", (event) => {
 
   worker.postMessage({input1, input2});
 } )
+
+
+// async function run() {
+//   await init();
+//     let r = await post_openai("https://api.openai.com/v1/chat/completions",
+//       "sk-rmoved", 
+//       "Where is the sun located");
+//   console.log(r)
+// }
+// run();
 // below is used for dynamically imported modules
 // const rust = import('./pkg')
 

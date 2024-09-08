@@ -6,9 +6,9 @@ wasm_bindgen("./pkg/wbgn_opeai_fr_end_bg.wasm")
   }).catch(console.error);
 
 self.onmessage = async function (event) {
-  const {input1, input2} = event.data;
+  const {prompt, apikey} = event.data;
   try {
-    const result = await wasm_bindgen.fetch_chat_completion(input1, input2);
+    const result = await wasm_bindgen.fetch_chat_completion(apikey, prompt);
     self.postMessage({ result })
   } catch (err) {
     console.error("Error in worker", err);

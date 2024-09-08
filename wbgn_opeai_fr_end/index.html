@@ -4,22 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WASM Chat Completion</title>
-    <script type="module">
-        import init, { post_openai } from '../pkg/tut_wasm1.js';
-
-        async function run() {
-            await init();
-            // greet("World");
-            // post request to the api works
-            // let x = await post_data("https://jsonplaceholder.typicode.com/posts/", "title1", "body1", 1);
-            // console.log(x);
-            let r = await post_openai("https://api.openai.com/v1/chat/completions",
-            "sk-rmoved", 
-            "Where is the sun located");
-            console.log(r)
-        }
-        run();
-    </script>
+    
 </head>
 <body>
     <!-- Input fields for API Key and Prompt -->
