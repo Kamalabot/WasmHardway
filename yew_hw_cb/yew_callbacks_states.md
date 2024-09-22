@@ -222,7 +222,6 @@ fn app() -> Html {
         <Parent />
     }
 }
-
 ```
 
 ### **Explanation:**
@@ -240,8 +239,6 @@ fn app() -> Html {
 3. **Data Flow**:
    
    - The data ("Hello from Child") is emitted by the child component and handled by the parent's callback function.
-
-
 
 ### **Use Case Example:**
 
@@ -441,8 +438,6 @@ Here's why `use_state` is important and differs from `String::new()`:
 
 In short, `String::new()` is for simple, local strings, while `use_state` is designed to manage state in complex, shared, or async contexts, ensuring that the state persists and is safely accessible across different parts of a program.
 
-
-
 In Yew, besides `use_state`, other state hooks provide different functionalities for managing component states, allowing more advanced state management patterns. Below are some of the commonly used state hooks in Yew:
 
 ### **1. `use_reducer`**
@@ -602,3 +597,101 @@ In Yew, besides `use_state`, other state hooks provide different functionalities
 - **`use_effect`**: Handles side effects, like data fetching and subscriptions, responding to dependency changes.
 
 These state hooks offer a flexible and powerful way to manage data and effects in Yew, allowing for highly interactive and responsive web applications.
+
+
+
+The `use_effect_with` hook doesn't exist in the Yew framework, which is why you're encountering issues when trying to use it. In Yew, effects are managed through the `use_effect` hook and `use_effect_with_deps`.
+
+### Correct Usage of `use_effect` and `use_effect_with_deps` in Yew
+
+- **`use_effect`**: Executes the effect once after the component renders. Typically used for side effects that don’t depend on external variables.
+
+- **`use_effect_with_deps`**: Executes the effect when certain dependencies change. It’s more like React’s `useEffect` with dependency array.
+
+### Example of Using `use_effect` in Yew
+
+```rust
+use yew::prelude::*;
+
+#[function_component(EffectComponent)]
+fn effect_component() -> Html {
+    let state = use_state(|| 0);
+
+    // Simple use_effect: Runs once after component mounts
+    {
+        let state = state.clone();
+        use_effect(move || {
+            log::info!("Component mounted, current state: {}", *state);
+            || {
+                log::info!("Component unmounted, cleanup here");
+            }
+        });
+    }
+
+    let onclick = {
+        let state = state.clone();
+        Callback::from(move |_| state.set(*state + 1))
+    };
+
+    html! {
+        <div>
+            <p>{ format!("Current count: {}", *state) }</p>
+            <button {onclick}>{ "Increment" }</button>
+        </div>
+    }
+}
+```
+
+### Explanation:
+
+- **use_effect**: Logs when the component mounts and cleans up when it unmounts.
+- **Cleanup Function**: Returning a closure from `use_effect` will run that code when the component unmounts, allowing you to do cleanup (e.g., removing event listeners).
+
+### Example of `use_effect_with_deps`
+
+If you want to trigger the effect based on the changes in specific values, use `use_effect_with_deps`.
+
+```rust
+use yew::prelude::*;
+
+#[function_component(EffectComponentWithDeps)]
+fn effect_component_with_deps() -> Html {
+    let count = use_state(|| 0);
+
+    // use_effect_with_deps: Runs the effect when the `count` changes
+    {
+        let count = count.clone();
+        use_effect_with_deps(
+            move |_| {
+                log::info!("Count has changed to: {}", *count);
+                || ()
+            },
+            [*count], // Dependency array
+        );
+    }
+
+    let increment = {
+        let count = count.clone();
+        Callback::from(move |_| count.set(*count + 1))
+    };
+
+    html! {
+        <div>
+            <p>{ format!("Current count: {}", *count) }</p>
+            <button onclick={increment}>{ "Increment" }</button>
+        </div>
+    }
+}
+```
+
+### Explanation:
+
+- **use_effect_with_deps**: The effect will only run when the value of `count` changes.
+- **Dependencies**: The array `[count]` ensures that the effect will only trigger when `count` changes. This is useful for optimizing performance by only running effects when necessary.
+
+### Summary of Hooks in Yew:
+
+1. **`use_effect`**: Runs once on component mount and cleanup on unmount.
+2. **`use_effect_with_deps`**: Runs the effect when the provided dependencies change.
+
+Let me know if this resolves the issue!
