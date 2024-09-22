@@ -311,89 +311,11 @@ fn app() -> Html {
 
 This approach ensures that the callback is executed as soon as the child component is rendered, sending data automatically to the parent.
 
-### Working with Hooks
+### Working with States & Hooks
 
 To pass the `greet` string from the `App` component to the frontend via the `HelloWorld` component and also log it to 
 
-inside `App` whenever the callback is triggered. Here's a complete approach to achieve this:
-
-### **Modified Code**
-
-1. **Update the `App` component to use state for `greet`**.
-2. **Pass the state update callback to `HelloWorld`**.
-3. **Display the updated string in `HelloWorld` and log it to the console**.
-
-Here's the updated implementation:
-
-```rust
-use yew::prelude::*;
-
-// Define properties for HelloWorld, which include a callback
-#[derive(Properties, PartialEq)]
-pub struct Cbprp {
-    pub on_name_entry: Callback<String>,
-}
-
-// HelloWorld component that emits a message through the callback
-#[function_component]
-fn HelloWorld(props: &Cbprp) -> Html {
-    // Emit the name "Tom" via the callback when the component renders
-    props.on_name_entry.emit(String::from("Tom"));
-
-    // Render the component UI
-    html! {
-        <div>
-            { "Hello" }
-        </div>
-    }
-}
-
-// Main App component
-#[function_component]
-pub fn App() -> Html {
-    // Use state to hold the greeting message
-    let greet = use_state(|| String::new());
-
-    // Define the callback to update the greet state and log to the console
-    let on_name_entry = {
-        let greet = greet.clone();
-        Callback::from(move |name: String| {
-            let message = format!("Hey there.. {}", name);
-
-            // Log the message to the console
-            web_sys::console::log_1(&message.clone().into());
-
-            // Update the greet state with the new message
-            greet.set(message);
-        })
-    };
-
-    // Render the HelloWorld component and display the greet message
-    html! {
-        <div>
-            <HelloWorld {on_name_entry} />
-            <p>{ &*greet }</p> // Display the greet message on the frontend
-        </div>
-    }
-}
-```
-
-### **Explanation of Changes**
-
-1. **State Management with `use_state`:**
-   
-   - `let greet = use_state(|| String::new());` initializes a state variable `greet` to hold the greeting message.
-
-2. **Callback Definition:**
-   
-   - The callback `on_name_entry` updates the state `greet` and logs the message to the browser console using `web_sys::console::log_1`.
-
-3. **Passing State to Frontend:**
-   
-   - The `HelloWorld` component triggers the callback via `emit`, which updates the `greet` state in `App`.
-   - The updated `greet` is then displayed in the paragraph element `<p>{ &*greet }</p>`.
-
-This setup ensures that the `greet` string is both logged to the console and displayed on the frontend through the `HelloWorld` component.
+inside `App` whenever the callback is triggered. Here's a complete approach to achieve this.
 
 In Yew, states (`use_state`) are crucial for managing component data that can change over time, allowing components to re-render when the data they depend on changes. States are particularly useful when handling user interactions, asynchronous data fetching, or managing dynamic content.
 
@@ -429,21 +351,25 @@ fn app() -> Html {
     let input_value = use_state(|| String::new()); // Holds the current text input
     let display_value = use_state(|| String::new()); // Holds the displayed text on the screen
 
-    // Callback to update the input_value state when the input changes
+    // Callback to update the input_value state 
+    // when the input changes
     let on_input = {
         let input_value = input_value.clone();
         Callback::from(move |event: InputEvent| {
-            let input = event.target_unchecked_into::<web_sys::HtmlInputElement>();
+            let input = 
+event.target_unchecked_into::<web_sys::HtmlInputElement>();\/
             input_value.set(input.value());
         })
     };
 
-    // Callback to update the display_value when the button is clicked
+    // Callback to update the display_value when
+    // the button is clicked
     let on_click = {
         let input_value = input_value.clone();
         let display_value = display_value.clone();
         Callback::from(move |_| {
-            let message = format!("Hello, {}!", *input_value); // Format a greeting message
+            let message = format!("Hello, {}!", 
+*input_value); // Format a greeting message
             web_sys::console::log_1(&message.clone().into()); // Log to the console
             display_value.set(message); // Update the display_value state
         })
@@ -452,8 +378,11 @@ fn app() -> Html {
     // Render the UI elements
     html! {
         <div>
-            <input type="text" placeholder="Enter your name" oninput={on_input} /> // Input box
-            <button onclick={on_click}>{ "Greet Me" }</button> // Button
+            <input type="text" 
+placeholder="Enter your name" 
+oninput={on_input} /> // Input box
+            <button onclick={on_click}>{ "Greet Me" }
+            </button> // Button
             <p>{ &*display_value }</p> // Display the greeting message
         </div>
     }
@@ -487,6 +416,32 @@ This pattern is commonly used in interactive web applications where data needs t
 - **Chat Applications**: Displaying messages in real-time as they are sent or received.
 
 Using state in this manner makes components responsive and interactive, providing users with immediate feedback based on their actions.
+
+When you're working in Rust, especially in asynchronous or stateful environments (like when building UIs or handling web apps with frameworks like Yew or Seed), `use_state` plays a critical role in managing state, while `String::new()` doesn't provide the same functionality.
+
+Here's why `use_state` is important and differs from `String::new()`:
+
+### `String::new()`
+
+- **What it does**: It simply creates a new empty `String`. The `String` can grow or change, but it's just a basic, mutable value.
+- **Scope**: The `String` you create exists in the scope where it's initialized. Once it's dropped (when the scope ends), the data is gone.
+- **Immutability**: Even if you create a mutable `String` (`let mut s = String::new()`), the mutability only lasts within the scope.
+
+### `use_state`
+
+- **What it does**: `use_state` is commonly used in environments like asynchronous apps (Tokio, async web servers, or UIs) to maintain state across renders or tasks. It creates state that can persist between function calls, task switches, or UI re-renders.
+- **Persistence**: The state managed by `use_state` is stored in a way that it persists beyond a single scope (for example, across renders in a UI framework).
+- **Shared Ownership**: `use_state` provides a way to safely share state between tasks or across components, often wrapping values like `Rc<RefCell<T>>` (in single-threaded contexts) or `Arc<Mutex<T>>` (in multi-threaded environments). This ensures that multiple parts of the program can access or modify the state without conflicts, enabling safe sharing of addresses.
+
+### Impact of `use_state` on Address Sharing
+
+- **Concurrency and Safety**: When multiple tasks or components need to access or modify the state concurrently, `use_state` ensures that this is done safely by managing the ownership and borrowing rules. It handles scenarios where multiple references to the state might exist.
+- **Controlled State Updates**: `use_state` wraps the state in a way that only allows updates in specific controlled manners (usually through closures that update the value).
+- **Avoiding Borrow Checker Issues**: `use_state` works around Rust's strict ownership and borrowing system by providing a way to mutate shared state without running into lifetime or borrowing issues. If you just used `String::new()` and tried to share it between tasks or components, you'd run into issues with Rust's ownership model.
+
+In short, `String::new()` is for simple, local strings, while `use_state` is designed to manage state in complex, shared, or async contexts, ensuring that the state persists and is safely accessible across different parts of a program.
+
+
 
 In Yew, besides `use_state`, other state hooks provide different functionalities for managing component states, allowing more advanced state management patterns. Below are some of the commonly used state hooks in Yew:
 
