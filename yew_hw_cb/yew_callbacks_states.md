@@ -476,11 +476,13 @@ In Yew, besides `use_state`, other state hooks provide different functionalities
   
   #[function_component(Counter)]
   fn counter() -> Html {
-      let state = use_reducer(|| Rc::new(CounterState { count: 0 }), reducer);
+      let state = use_reducer(|| 
+      Rc::new(CounterState { count: 0 }), reducer);
   
       html! {
           <div>
-              <button onclick={state.dispatch(CounterAction::Decrement)}>{ "Decrement" }</button>
+              <button onclick={state.dispatch(CounterAction
+              ::Decrement)}>{ "Decrement" }</button>
               <p>{ state.count }</p>
               <button onclick={state.dispatch(CounterAction::Increment)}>{ "Increment" }</button>
           </div>
