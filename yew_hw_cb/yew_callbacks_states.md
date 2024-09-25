@@ -438,6 +438,73 @@ Here's why `use_state` is important and differs from `String::new()`:
 
 In short, `String::new()` is for simple, local strings, while `use_state` is designed to manage state in complex, shared, or async contexts, ensuring that the state persists and is safely accessible across different parts of a program.
 
+##### Here is another example of Use State with Vectos
+
+```rust
+use yew::prelude::*;
+use gloo_net::http::Request;
+use serde::Deserialize;
+
+#[derive(Deserialize, Clone, PartialEq)]
+struct DataItem {
+    id: u32,
+    name: String,
+}
+
+#[function_component(App)]
+fn app() -> Html {
+    let data = use_state(|| Vec::new());
+
+    {
+        let data = data.clone();
+        use_effect_with_deps(
+            move |_| {
+                wasm_bindgen_futures::spawn_local(async move {
+                    let fetched_data: Vec<DataItem> = Request::get("https://api.example.com/data")
+                        .send()
+                        .await
+                        .unwrap()
+                        .json()
+                        .await
+                        .unwrap();
+                    data.set(fetched_data);
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
+    html! {
+        <>
+            <h1>{ "Data List" }</h1>
+            <ul>
+                { for data.iter().map(|item| html! {
+                    <li key={item.id}>{ format!("{}: {}", item.id, item.name) }</li>
+                })}
+            </ul>
+        </>
+    }
+}
+```
+
+
+
+To resolve this, you can dereference the `UseStateHandle<Vec<Employee>>` using `*emp_list` when passing it as a prop.
+
+Here's the corrected code:
+
+```rust
+<EmpList employees={(*emp_list).clone()} />
+```
+
+Explanation:
+
+- `*emp_list` dereferences the `UseStateHandle` to get the underlying `Vec<Employee>`.
+- `.clone()` is used because Yew components expect the props to be owned, and `Vec<Employee>` implements `Clone`.
+
+
+
 In Yew, besides `use_state`, other state hooks provide different functionalities for managing component states, allowing more advanced state management patterns. Below are some of the commonly used state hooks in Yew:
 
 ### **1. `use_reducer`**
@@ -597,8 +664,6 @@ In Yew, besides `use_state`, other state hooks provide different functionalities
 - **`use_effect`**: Handles side effects, like data fetching and subscriptions, responding to dependency changes.
 
 These state hooks offer a flexible and powerful way to manage data and effects in Yew, allowing for highly interactive and responsive web applications.
-
-
 
 The `use_effect_with` hook doesn't exist in the Yew framework, which is why you're encountering issues when trying to use it. In Yew, effects are managed through the `use_effect` hook and `use_effect_with_deps`.
 
